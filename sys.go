@@ -2,9 +2,9 @@
 * @Author: scottxiong
 * @Date:   2020-10-23 11:30:17
 * @Last Modified by:   scottxiong
-* @Last Modified time: 2020-10-23 11:40:20
+* @Last Modified time: 2020-10-23 14:27:14
  */
-package main
+package sys
 
 import (
 	"os/exec"
