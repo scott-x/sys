@@ -38,7 +38,8 @@ func runInLinux(cmd string) (string, error) {
 
 //check if the process is running by given name
 func IsProcessRunning(serverName string) (bool, error) {
-	a := `ps ux | awk '/` + serverName + `/ && !/awk/ {print $2}'`
+	// a := `ps ux | awk '/` + serverName + `/ && !/awk/ {print $2}'` => works on mac, not linux
+	a := `ps -ef | awk '/` + serverName + `/ && !/awk/ {print $2}'`
 	pid, err := RunCommand(a)
 	if err != nil {
 		return false, err
