@@ -49,7 +49,7 @@ func IsProcessRunning(serverName string) (bool, error) {
 
 //get the process id by given name
 func GetPid(serverName string) (string, error) {
-	a := `ps ux | awk '/` + serverName + `/ && !/awk/ {print $2}'`
+	a := `ps -ef | awk '/` + serverName + `/ && !/awk/ {print $2}'`
 	pid, err := RunCommand(a)
 	return pid, err
 }
