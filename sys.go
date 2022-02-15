@@ -7,8 +7,11 @@
 package sys
 
 import (
+	"fmt"
+	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
 	"strings"
 )
 
@@ -38,6 +41,10 @@ func runInLinux(cmd string) (string, error) {
 
 //check if the process is running by given name
 func IsProcessRunning(serverName string) (bool, error) {
+	if runtime.GOOS == "windows" {
+		flag, _, _ := isProcessExistOnWindows(serverName)
+		return flag, nil
+	}
 	// a := `ps ux | awk '/` + serverName + `/ && !/awk/ {print $2}'` => works on mac, not linux
 	a := `ps -ef | awk '/` + serverName + `/ && !/awk/ {print $2}'`
 	pid, err := RunCommand(a)
@@ -49,7 +56,34 @@ func IsProcessRunning(serverName string) (bool, error) {
 
 //get the process id by given name
 func GetPid(serverName string) (string, error) {
+	if runtime.GOOS == "windows" {
+		_, _, pid := isProcessExistOnWindows(serverName)
+		return strconv.Itoa(pid), nil
+	}
 	a := `ps -ef | awk '/` + serverName + `/ && !/awk/ {print $2}'`
 	pid, err := RunCommand(a)
 	return pid, err
+}
+
+func isProcessExistOnWindows(appName string) (bool, string, int) {
+	appary := make(map[string]int)
+	cmd := exec.Command("cmd", "/C", "tasklist")
+	output, _ := cmd.Output()
+	//fmt.Printf("fields: %v\n", output)
+	n := strings.Index(string(output), "System")
+	if n == -1 {
+		fmt.Println("no find")
+		os.Exit(1)
+	}
+	data := string(output)[n:]
+	fields := strings.Fields(data)
+	for k, v := range fields {
+		if v == appName {
+			appary[appName], _ = strconv.Atoi(fields[k+1])
+
+			return true, appName, appary[appName]
+		}
+	}
+
+	return false, appName, -1
 }
